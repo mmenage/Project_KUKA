@@ -1,0 +1,490 @@
+package application;
+
+
+import com.kuka.generated.ioAccess.MediaFlangeIOGroup;
+import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
+import static com.kuka.roboticsAPI.motionModel.BasicMotions.*;
+
+import com.kuka.roboticsAPI.controllerModel.Controller;
+import com.kuka.roboticsAPI.controllerModel.sunrise.ISafetyState;
+import com.kuka.roboticsAPI.deviceModel.LBR;
+import com.kuka.roboticsAPI.deviceModel.OperationMode;
+import com.kuka.roboticsAPI.geometricModel.AbstractFrame;
+import com.kuka.roboticsAPI.geometricModel.CartDOF;
+import com.kuka.roboticsAPI.geometricModel.Frame;
+import com.kuka.roboticsAPI.geometricModel.ObjectFrame;
+import com.kuka.roboticsAPI.geometricModel.Tool;
+import com.kuka.roboticsAPI.geometricModel.math.Transformation;
+import com.kuka.roboticsAPI.motionModel.Spline;
+import com.kuka.roboticsAPI.motionModel.SplineJP;
+import com.kuka.roboticsAPI.motionModel.controlModeModel.CartesianSineImpedanceControlMode;
+
+
+/* Test des mouvements du robot Kuka avec la base "Paper"
+ * 
+ */
+
+public class Essais_Mouvement extends RoboticsAPIApplication {
+	private Controller kuka_Sunrise_Cabinet_1;
+	private LBR lbr_iiwa_14_R820_1;
+
+	private MediaFlangeIOGroup ioFlange;
+	
+	private CartesianSineImpedanceControlMode impedanceControlMode;
+	
+	private Tool penTool;
+	private ObjectFrame penToolTCP;
+	
+	private ObjectFrame paperBase;
+	private ObjectFrame paperP1;
+	private ObjectFrame paperP2;
+	private ObjectFrame paperP3;
+	private ObjectFrame paperP0;
+	
+	private ObjectFrame nearPaper0;
+	private ObjectFrame paperApproach;
+	
+	
+	private Frame P0;
+	private Frame P1;
+	private Frame P2;
+	private Frame P3;
+	private Frame nearPaperP0;
+	
+	
+	double x0,x1,x2,x3;
+	double y0,y1,y2,y3;
+	
+	Line Ligne;
+	
+	
+	private Transformation getTranslationWithSpecifiedZ(ObjectFrame frameBefore, Frame p02, double z)
+	{
+		return Transformation.ofTranslation(
+				p02.getX()-frameBefore.getX(), 
+				p02.getY()-frameBefore.getY(), 
+				z
+				);
+	}
+	
+	private Transformation getTranslationFromFrame(Frame frameBefore, Frame frameDestination)
+	{
+		return Transformation.ofTranslation(
+				frameDestination.getX()-frameBefore.getX(), 
+				frameDestination.getY()-frameBefore.getY(), 
+				frameDestination.getZ()-frameBefore.getZ()
+				);
+	}
+	
+	public void initialize() {
+		
+		// Ligne = new Line(60,140,230,40);
+		
+		
+		
+		kuka_Sunrise_Cabinet_1 = getController("KUKA_Sunrise_Cabinet_1");
+		lbr_iiwa_14_R820_1 = (LBR) getDevice(kuka_Sunrise_Cabinet_1, "LBR_iiwa_14_R820_1");
+
+		ioFlange = new MediaFlangeIOGroup(kuka_Sunrise_Cabinet_1);
+	
+		// On crée la compliance pour rendre le bras "mou"
+		impedanceControlMode = new CartesianSineImpedanceControlMode();
+		impedanceControlMode.parametrize(CartDOF.X).setStiffness(3000);
+		impedanceControlMode.parametrize(CartDOF.Y).setStiffness(3000);
+		impedanceControlMode.parametrize(CartDOF.Z).setStiffness(3000);
+		
+		impedanceControlMode.parametrize(CartDOF.A).setStiffness(200);
+		impedanceControlMode.parametrize(CartDOF.B).setStiffness(200);
+		impedanceControlMode.parametrize(CartDOF.C).setStiffness(200);
+		
+		// On crée l'outil stylo, on l'attache au flange et on récupére le point en bout de stylo "penToolTCP"
+		penTool = getApplicationData().createFromTemplate("penTool");
+		penTool.attachTo(lbr_iiwa_14_R820_1.getFlange() );
+		penToolTCP = penTool.getFrame("/penToolTCP");
+		
+		
+		// On charge les points de l'application
+		paperBase = getApplicationData().getFrame("/Paper");
+		paperP1 = getApplicationData().getFrame("/Paper/P1");
+		paperP2 = getApplicationData().getFrame("/Paper/P2");
+		paperP3 = getApplicationData().getFrame("/Paper/P3");
+		paperP0 = getApplicationData().getFrame("/Paper/P0");
+		
+		nearPaper0 = getApplicationData().getFrame("/Paper/NearPaper0");
+		paperApproach = getApplicationData().getFrame("/Paper/PaperApproach");
+		
+		
+		
+		
+		
+				
+	//	nearPaperP0 = new Frame(paperBase).setX(40).setY(40).setZ(10).setAlphaRad(-0.3).setBetaRad(1.5).setGammaRad(-1.1);
+		
+	//	P0 = new Frame(nearPaper0).setX(Ligne.Start.x).setY(Ligne.Start.y).setZ(0);
+				
+	//	P1 = new Frame(nearPaper0).setX(Ligne.End.x).setY(Ligne.End.y).setZ(0);
+		
+		
+	//	P2 = new Frame(nearPaper0).setX(x2).setY(y2).setZ(0);
+	//	P3 = new Frame(nearPaper0).setX(x3).setY(y3).setZ(0);
+		
+		
+		
+		getLogger().info("Initialization OK");
+	}
+
+	
+	public void In_Position(double x, double y){
+		
+		double velocity = 0.2;
+		
+		P0 = new Frame(paperApproach).setX(x).setY(y).setZ(0);
+		
+		penToolTCP.move(
+				ptp(paperApproach).setJointVelocityRel(velocity)
+			);
+		
+		penToolTCP.move(
+				lin(nearPaper0).setJointVelocityRel(velocity)
+			);
+		
+		
+		getLogger().info("En position");
+		penToolTCP.move(
+				linRel(getTranslationWithSpecifiedZ(nearPaper0,P0 , P0.getZ() - nearPaper0.getZ() ), paperBase)
+			);
+		
+	}
+	
+	public void Draw(double x, double y, double x2, double y2){
+		
+		P1 = new Frame(x, y, 0);
+		P2 = new Frame(x2, y2, 0);
+		
+		getLogger().info("Je vais en P1");
+				
+		
+		penToolTCP.move(
+				// linRel(20.0,20.0,0.0, paperBase)			
+				linRel(getTranslationFromFrame(P1,P2) ,paperBase)
+				
+			//	linRel(20, 20, 0, paperBase)
+			);
+		
+		
+		getLogger().info("Fin du trait");
+		
+	}
+	
+	
+	public void Draw_Curve(){
+		
+	}
+	
+	
+	// fonction pour tracer une ligne
+	public void Trace_Line(double x, double y, double x2, double y2){
+		
+		
+		double velocity = 0.2;
+		In_Position(x, y);
+		Draw(x, y, x2, y2);
+		
+	//	nearPaperP0 = new Frame(paperApproach).setX(x).setY(y).setZ(10);
+		
+		// Je vais en P0
+	//	P0 = new Frame(paperApproach).setX(x).setY(y).setZ(0);
+		
+		
+		// je vais en P0 version 2
+		
+/*		
+		P0 = new Frame(paperApproach).setX(x).setY(y).setZ(10);
+		
+		penToolTCP.move(
+				ptp(paperApproach).setJointVelocityRel(velocity)
+			);
+		
+		penToolTCP.move(
+				lin(nearPaper0).setJointVelocityRel(velocity)
+			);
+		
+		
+		getLogger().info("En position");
+		penToolTCP.move(
+				linRel(getTranslationWithSpecifiedZ(nearPaper0,P0 , P0.getZ() - nearPaper0.getZ() ), paperBase)
+			);
+		
+*/
+	
+		
+		
+		
+		// DERNIER COMMENTAIRE ICI
+		
+/*		
+		P1 = new Frame(x, y, 0);
+		P2 = new Frame(x2, y2, 0);
+		
+		getLogger().info("Je vais en P0");
+*/
+		
+		
+		
+		
+		
+	/*	
+		penToolTCP.move(
+				lin(P0).setJointVelocityRel(velocity)
+			);
+	*/	
+		
+		// essai en bougeant avec des linRel
+		
+		
+		
+		// DERNIER COMMENTAIRE ICI
+	/*
+		penToolTCP.move(
+				// linRel(20.0,20.0,0.0, paperBase)			
+				linRel(getTranslationFromFrame(P1,P2) ,paperBase)
+				
+			//	linRel(20, 20, 0, paperBase)
+			);
+		
+		
+		
+		
+		
+		
+		getLogger().info("Je vais en P1");
+	/*	penToolTCP.move(
+				lin(P1).setJointVelocityRel(velocity)
+			); 
+		
+	*/	
+		
+/*
+		
+		getLogger().info("Je me leve de la feuille");
+		penToolTCP.move(  // on relève la pointe du stylo
+				lin(nearPaperP0).setJointVelocityRel(velocity)
+			);
+		
+	*/	
+		
+	//	getLogger().info("Fin fonction");
+		
+	}
+	// fonction pour tracer un rectangle
+
+	public void Trace_Rectangle(double x, double y, double hauteur, double longueur){
+		
+		In_Position(x, y);
+		
+		Draw(x, y, x + longueur, y);
+		Draw(x + longueur, y, x + longueur, y + hauteur);
+		Draw(x + longueur, y + hauteur, x , y + hauteur);
+		Draw(x , y + hauteur , x , y);
+		
+	}
+	
+/*	
+	// version avec deux points à l'opposé
+	public void Trace_Rectangle(double x, double y, double x2, double y2){
+		
+		
+		Trace_Line(x, y,x2, y);
+		Trace_Line(x2, y, x2, y2);
+		Trace_Line(x2, y2, x2, y);
+		Trace_Line(x2, y , x , y);
+		
+	}
+	
+	
+/*	
+	public void Trace_Rec(double x, double y, double hauteur, double longueur){
+		
+		double velocity = 0.2;
+		
+		nearPaperP0 = new Frame(paperBase).setX(x).setY(y).setZ(10).setAlphaRad(-0.3).setBetaRad(1.5).setGammaRad(-1.1);
+		
+		penToolTCP.move(
+				lin(nearPaperP0).setJointVelocityRel(velocity)
+			);
+		
+		P0 = new Frame(nearPaperP0).setX(Ligne.Start.x).setY(Ligne.Start.y).setZ(10);
+		
+		penToolTCP.move(
+				lin(P0).setJointVelocityRel(velocity)
+			);
+		
+		P1 = new Frame(nearPaperP0).setX(x).setY(y).setZ(0);
+		
+		P1.setX(x + longueur).setY(y); // j'avance sur x
+		penToolTCP.move(
+				lin(P1).setJointVelocityRel(velocity)
+			);
+		
+		P1.setY(y + hauteur);	// je monte en Y
+		penToolTCP.move(
+				lin(P1).setJointVelocityRel(velocity)
+			);
+		
+		
+		P1.setX(x); // je me décale sur les X
+		penToolTCP.move(
+				lin(P1).setJointVelocityRel(velocity)
+			);
+		
+		penToolTCP.move(	// retour sur le premier point
+				lin(P0).setJointVelocityRel(velocity)
+			);
+		
+		penToolTCP.move( // on relève la pointe du stylo
+				lin(nearPaperP0).setJointVelocityRel(velocity)
+			);
+		
+	}
+	
+/*	
+	
+	public void Courbe(){
+	
+	
+	
+	}
+	
+	
+	public void Triangle_Rectangle(double x, double y, double x2, double y2){
+		
+		Trace_Line(x,y,x2,y2);
+		Trace_Line(x2,y2,x2,y);
+		Trace_Line(x2,y,x,y);
+		
+	}
+	
+	public void Triangle_Isocele(double x, double y, double x2, double y2){
+		
+		Trace_Line(x,y,x2,y2);
+		Trace_Line(x2,y2,x2+x,y);
+		Trace_Line(x2+x,y,x,y);
+		
+	}
+	
+	
+	public void Triangle_Equilateral(){
+		
+	}
+	
+	
+	*/
+	public void run() {
+		
+		double velocity = 0.2;
+		
+		ISafetyState currentState = lbr_iiwa_14_R820_1.getSafetyState();
+		OperationMode mode = currentState.getOperationMode();
+		if (mode==OperationMode.AUT)
+		{
+			//******* ATTENTION : AVANT D'ACTIVE LE MODE AUTO, VERIFIER LES TRAJECTOIRES ********//
+			// Si on est en mode AUTO, pleine vitesse activée
+			
+			velocity = 1;
+		}
+		
+		lbr_iiwa_14_R820_1.move(ptpHome());
+		
+		// allumer la lumière
+		ioFlange.setLEDBlue(true);
+		
+
+		
+		// Approche de la base "Paper" en PTP puis en LIN
+		
+		getLogger().info("Move near Paper");
+				
+		penToolTCP.move(
+				ptp(paperApproach).setJointVelocityRel(velocity)
+			);
+/*		
+
+		
+		penToolTCP.move(
+				lin(nearPaperP0).setJointVelocityRel(velocity)
+			);
+		
+*/		
+		getLogger().info("Je vais me mettre en place");
+		
+	//	In_Position(x, y);
+		//Trace_Line(40, 40, 100, 100);
+		Trace_Rectangle(30, 30, 50, 100);
+		Trace_Line(30, 30, 130, 80);
+		
+/*
+		penToolTCP.move(
+				lin(P0).setJointVelocityRel(velocity)
+			);
+/*		
+		penToolTCP.move(
+				lin(P1).setJointVelocityRel(velocity)
+			);  
+			
+*/
+		
+		// On dessine sur le papier les points nearPaper1 / P0 / P1 / P2 / P3 :
+		
+/*		getLogger().info("Move on Paper");
+		Spline drawingSpline = new Spline(
+				
+					// On bouge en relatif
+					// Premier mouvement, on va en de nearPaper1 vers P0.
+					linRel( getTranslationWithSpecifiedZ(nearPaper0, paperP0, paperP0.getZ() - nearPaper0.getZ() ), paperBase),
+					
+					// On va ensuite à P1, P2, P3 et P0, en spécifiant une translation Z nulle 
+					linRel( getTranslationWithSpecifiedZ(paperP0, paperP1, 0), paperBase),
+					linRel( getTranslationWithSpecifiedZ(paperP1, paperP2, 0), paperBase),
+					linRel( getTranslationWithSpecifiedZ(paperP2, paperP3, 0), paperBase),
+					linRel( getTranslationWithSpecifiedZ(paperP3, paperP0, 0), paperBase)
+				);
+		
+		penToolTCP.move(
+				drawingSpline.setJointVelocityRel(velocity)
+				.setJointAccelerationRel(1)
+				.setMode(impedanceControlMode)
+			);
+*/		
+		
+		
+	//	Trace_Line();
+		
+		
+		// On reléve la pointe du stylo
+/*		penToolTCP.move( 
+				linRel( getTranslationFromFrame(paperP0, nearPaper0), paperBase) 
+			);
+		
+*/		
+		// On revient à la "maison"
+		getLogger().info("Go back to home");
+		
+		penToolTCP.move( lin(paperApproach).setJointVelocityRel(velocity));
+		
+		SplineJP moveBackToHome = new SplineJP( ptpHome());
+		
+		getLogger().info("Move Back");
+		lbr_iiwa_14_R820_1.move(
+				moveBackToHome.setJointVelocityRel(velocity)
+			);
+		
+		ioFlange.setLEDBlue(false);
+	}
+
+	
+
+	public static void main(String[] args) {
+		Essais_Mouvement app = new Essais_Mouvement();
+		app.runApplication();
+	}
+}
