@@ -193,6 +193,8 @@ var loadFile = function(event) {
 			
 			<div style="height:300px; margin-top:20px;float:right;"><img id="imagepreview" style="max-width:360px; max-height:300px;"/></div>
 			<div style="clear:both"></div>
+			 <br/>
+			<button id="sendToRobot">Envoyer au robot</button>
 		</div>
 	</div>
 
@@ -202,6 +204,30 @@ var loadFile = function(event) {
 	});
 	$("#submit-btn").click(function() {
 		$("#uploadedFiles").remove();
+	});
+	$("#sendToRobot").click(function() {
+		var svg = "svg:"+$("#imagepreview").attr("src");
+		$.ajax({
+			url: 'server.php',
+			type: 'POST',
+			data: svg,
+			dataType: 'text',
+			success: function(response) {
+				response = JSON.parse(response);
+				if (response.error == "null"){
+					
+					if (response.success == true){
+						alert("Envoyé avec succès !");
+					}
+					else {
+						alert("Non envoyé !");
+					}
+				}
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) { 
+				alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+			} 
+		});
 	});
 	</script>
 

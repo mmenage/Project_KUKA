@@ -63,12 +63,36 @@
 	</div>
 
 	<script>
-	$("#sendToRobot").click(function() {
+	$("#snap").click(function() {
 		var base64image = "base64image:"+$("#imagepreview").attr("src");
 		$.ajax({
 			url: 'base64webcamupload.php',
 			type: 'POST',
 			data: base64image,
+			dataType: 'text',
+			success: function(response) {
+				response = JSON.parse(response);
+				if (response.error == "null"){
+					
+					if (response.success == true){
+						alert("Envoyé avec succès !");
+					}
+					else {
+						alert("Non envoyé !");
+					}
+				}
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) { 
+				alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+			} 
+		});
+	});
+	$("#sendToRobot").click(function() {
+		var cam = "cam:"+$("#imagepreview").attr("src");
+		$.ajax({
+			url: 'server.php',
+			type: 'POST',
+			data: cam,
 			dataType: 'text',
 			success: function(response) {
 				response = JSON.parse(response);

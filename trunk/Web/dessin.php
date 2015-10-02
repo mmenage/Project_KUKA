@@ -55,11 +55,11 @@
 		  </style>
 
 		  <p>
-			<label>Drawing tool: 
+			<label><span style="color:white;">Outils de dessins:</span>
 			  <select id="dtool">
-				<option value="line">Line</option>
+				<option value="line">Ligne</option>
 				<option value="rect">Rectangle</option>
-				<option value="pencil">Pencil</option>
+				<option value="pencil">Pinceau</option>
 			  </select>
 			</label>
 		  </p>
@@ -96,6 +96,7 @@
 	var canvas = document.getElementById("canvasDiv");
 	canvas.addEventListener("mousedown", getPosition, false);
 	canvas.addEventListener("mouseup", getPosition, false);
+	
 	function getPosition(event){
 		$("#container").css("position","")
 		var x1 = document.getElementById("canvasDiv").offsetLeft;
@@ -110,22 +111,89 @@
 
 		var Negative = -1 ;
 
-		// alert($(window).height());
 		var posX = x - x1 ;
 		var posY = y - y1 - yMax;
 		var posY = posY * Negative;
 		if(event.type == "mouseup"){
-			if ($("#point").text() != ""){
-				alert("Point 1 : " + $("#point").text() + " Point 2 : " + (posX) + ', ' + (posY) );
+			if ($( "#dtool" ).val() == "line"){
+				if ($("#point").text() != ""){
+					$("#ListOfPoints").append("("+$("#point").text()+");"+"("+(posX) + ',' + (posY)+")|");
+				}
+			}
+			else if ($( "#dtool" ).val() == "rect"){
+				var point = $("#point").text().split(",");
+				
+				x1 = point[0]  ;  y1 = point[1] ;    // First diagonal point
+				x2 = posX  ;  y2 = posY ;    // Second diagonal point
+
+				x3 = x1;
+				y3 = y2;
+				
+				x4 = x2;
+				y4 = y1;
+				
+				$("#ListOfPoints").append("("+x1+","+y1+");"+"("+x3+ ',' + y3+")|("+x1+","+y1+");"+"("+x4+ ',' + y4+")|("+x2+","+y2+");"+"("+x4+ ',' + y4+")|("+x2+","+y2+");"+"("+x3+ ',' + y3+")|");
+				// alert($("#ListOfPoints").text());
+				
 			}
 			$("#point").text("");
 		}
 		else if(event.type == "mousedown"){
-			$("#point").text((posX) + ', ' + (posY));
+			$("#point").text((posX) + ',' + (posY));
 		}
 		$("#container").css("position", "relative");
 		
 	}
+	
+	// $("#sendToRobot").click(function() {
+		// var draw = $("#ListOfPoints").text();
+		// $.ajax({
+			// url: 'senddrawtorobot.php',
+			// type: 'POST',
+			// data: draw,
+			// dataType: 'text',
+			// success: function(response) {
+				// response = JSON.parse(response);
+				// if (response.error == "null"){
+					
+					// if (response.success == true){
+						// alert("Envoyé avec succès !");
+					// }
+					// else {
+						// alert("Non envoyé !");
+					// }
+				// }
+			// },
+			// error: function(XMLHttpRequest, textStatus, errorThrown) { 
+				// alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+			// } 
+		// });
+	// });
+	
+	$("#sendToRobot").click(function() {
+		var draw = "des:"+$("#ListOfPoints").text();
+		$.ajax({
+			url: 'server.php',
+			type: 'POST',
+			data: draw,
+			dataType: 'text',
+			success: function(response) {
+				response = JSON.parse(response);
+				if (response.error == "null"){
+					
+					if (response.success == true){
+						alert("Envoyé avec succès !");
+					}
+					else {
+						alert("Non envoyé !");
+					}
+				}
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) { 
+				alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+			} 
+		});
+	});
 	</script>
 
 <?php include("footer.php"); ?>
