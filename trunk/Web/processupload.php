@@ -1,22 +1,21 @@
 <?php
 if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 {
-	$UploadDirectory	= 'D:/wamp/www/Kukka/uploads/'; //specify upload directory ends with / (slash)
+	$UploadDirectory	= 'D:/wamp/www/Kukka/uploads/'; //Dossier de destination
 	
-	// check if this is an ajax request
+	// Check si la requête est une requête ajax
 	if (!isset($_SERVER['HTTP_X_REQUESTED_WITH'])){
 		die();
 	}
 	
-	//Is file size is less than allowed size.
+	//Limite de taille
 	if ($_FILES["FileInput"]["size"] > 5242880) {
 		die("File size is too big!");
 	}
 	
-	//allowed file type Server side check
+	//Type de fichier autorisés
 	switch(strtolower($_FILES['FileInput']['type']))
 		{
-			//allowed file types
             case 'image/png': 
 			case 'image/gif': 
 			case 'image/jpeg': 
@@ -24,16 +23,17 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 			case 'image/svg+xml':
 				break;
 			default:
-				die('Unsupported File!'); //output error
+				die('Unsupported File!');
 	}
 	
 	$File_Name          = strtolower($_FILES['FileInput']['name']);
-	$File_Ext           = substr($File_Name, strrpos($File_Name, '.')); //get file extention
-	$Random_Number      = rand(0, 9999999999); //Random number to be added to name.
-	$NewFileName 		= $Random_Number.$File_Ext; //new file name
+	$File_Ext           = substr($File_Name, strrpos($File_Name, '.')); //Extension du fichier
+	$Random_Number      = rand(0, 9999999999); //Numéro aléatoire pour le nom du fichier
+	$NewFileName 		= $Random_Number.$File_Ext; //Nouveau nom du fichier
 	
-	if(move_uploaded_file($_FILES['FileInput']['tmp_name'], $UploadDirectory.$NewFileName ))
+	if(move_uploaded_file($_FILES['FileInput']['tmp_name'], $UploadDirectory.$NewFileName )) // Si le fichier télécharger peut être déplacé
 	   {
+		// Création du html pour mettre à jour la liste
 		echo '<table id="uploadedFiles" style="width:360px; float:left;">';
 		$dir    = 'uploads';
 		$imagesUploaded = scandir($dir);

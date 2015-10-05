@@ -1,18 +1,24 @@
 <?php
     
     function sendCamImage($data){
+		// Type de donnée
 		$GLOBALS['type'] = 'src';
+		// On retire l'extension au début du fichier qui permet de différencier le module
 		$data = substr($data, 4, strlen($data));
-    
+		
+		// Donnée en globale afin d'être accessible partout
 		$GLOBALS['src']=$data;
-		echo $json;
+		echo $data;
     
     }
     function sendDrawImage($data){
+		// Type de donnée
         $GLOBALS['type'] = 'json';
+		// On retire l'extension au début du fichier qui permet de différencier le module
         $data = substr($data, 4, strlen($data));
         $ListOfPoints = explode("|", $data);
         
+		// Création du jSon
         $json = '{ "dessin":[{';
         for ($i=0; $i<count($ListOfPoints)-1; $i++){
             $currentPoint = explode(";", $ListOfPoints[$i]);
@@ -30,22 +36,29 @@
             }
         }
         $json.="}]}";
+		// Donnée en globale afin d'être accessible partout
         $GLOBALS['src'] = $json;
 		echo $json;
         
     }
     function sendSvgImage($data){
+		// Type de donnée
         $GLOBALS['type'] = 'json';
+		// On retire l'extension au début du fichier qui permet de différencier le module
         $data = substr($data, 4, strlen($data));
         
+		// Donnée en globale afin d'être accessible partout
         $GLOBALS['src']=$data;
+		echo $data;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') { 
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+		// Récupération du post
         $data = file_get_contents('php://input');
         
         $whichFiletoSend = substr($data, 0, 3);
         
+		// Exécution de la fonction en fonction du module
         switch ($whichFiletoSend) {
             case "cam":
                 sendCamImage($data);

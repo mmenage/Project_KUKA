@@ -52,7 +52,8 @@ function getLoadedFiles(){
 		$currentimage = $imagesUploaded[$i];
 		$checkExtension = explode(".", $currentimage);
 		
-		if ($checkExtension[1] == "png" or $checkExtension[1] == "gif" or $checkExtension[1] == "jpeg" or $checkExtension[1] == "pjpeg" or $checkExtension[1] == "svg" or $checkExtension[1] == "pdf"){
+		// if ($checkExtension[1] == "png" or $checkExtension[1] == "gif" or $checkExtension[1] == "jpeg" or $checkExtension[1] == "pjpeg" or $checkExtension[1] == "svg" or $checkExtension[1] == "pdf"){
+		if ($checkExtension[1] == "svg"){
 			$imagefolder = "uploads/".$currentimage;
 			if ($h==1){
 				echo "<tr>";

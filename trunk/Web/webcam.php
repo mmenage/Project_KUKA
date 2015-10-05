@@ -69,7 +69,6 @@
 			success: function(response) {
 				response = JSON.parse(response);
 				if (response.error == "null"){
-					
 					if (response.success == true){
 						alert("Envoyé avec succès !");
 					}
@@ -83,6 +82,7 @@
 			} 
 		});
 	});
+
 	window.addEventListener("DOMContentLoaded", function() {
 		// Grab elements, create settings, etc.
 		var canvas = document.getElementById("canvas"),
@@ -126,6 +126,10 @@
 			type: 'POST',
 			data: base64image,
 			dataType: 'text',
+			success: function(response) {
+				response = JSON.parse(response);
+				$("#imagepreview").attr("src", response.src);
+			},
 			error: function(XMLHttpRequest, textStatus, errorThrown) { 
 				alert("Status: " + textStatus); alert("Error: " + errorThrown); 
 			} 
