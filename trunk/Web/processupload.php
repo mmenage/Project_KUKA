@@ -4,9 +4,9 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 	$UploadDirectory	= 'D:/wamp/www/Kukka/uploads/'; //specify upload directory ends with / (slash)
 	
 	// check if this is an ajax request
-	// if (!isset($_SERVER['HTTP_X_REQUESTED_WITH'])){
-		// die();
-	// }
+	if (!isset($_SERVER['HTTP_X_REQUESTED_WITH'])){
+		die();
+	}
 	
 	//Is file size is less than allowed size.
 	if ($_FILES["FileInput"]["size"] > 5242880) {
@@ -22,7 +22,6 @@ if(isset($_FILES["FileInput"]) && $_FILES["FileInput"]["error"]== UPLOAD_ERR_OK)
 			case 'image/jpeg': 
 			case 'image/pjpeg':
 			case 'image/svg+xml':
-			case 'application/pdf':
 				break;
 			default:
 				die('Unsupported File!'); //output error

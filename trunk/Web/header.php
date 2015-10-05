@@ -17,8 +17,11 @@
           <div class="navigation ">
             <nav>
               <ul class="sf-menu">
-               <li class="current"><a href="index.php">Menu</a></li>
-               <!--<li><a href="index-1.html">SVG images</a></li>-->
+               <li class="current"><a href="index.php">Accueil</a></li>
+               <li><a href="svg.php">SVG images</a></li>
+               <li><a href="cdc.php">Chaîne</a></li>
+               <li><a href="webcam.php">Webcam</a></li>
+               <li><a href="dessin.php">Dessins</a></li>
              </ul>
             </nav>
             <div class="clear"></div>

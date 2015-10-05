@@ -129,8 +129,6 @@
 				y4 = y1;
 				
 				$("#ListOfPoints").append("("+x1+","+y1+");"+"("+x3+ ',' + y3+")|("+x1+","+y1+");"+"("+x4+ ',' + y4+")|("+x2+","+y2+");"+"("+x4+ ',' + y4+")|("+x2+","+y2+");"+"("+x3+ ',' + y3+")|");
-				// alert($("#ListOfPoints").text());
-				
 			}
 			$("#point").text("");
 		}
@@ -140,31 +138,6 @@
 		$("#container").css("position", "relative");
 		
 	}
-	
-	// $("#sendToRobot").click(function() {
-		// var draw = $("#ListOfPoints").text();
-		// $.ajax({
-			// url: 'senddrawtorobot.php',
-			// type: 'POST',
-			// data: draw,
-			// dataType: 'text',
-			// success: function(response) {
-				// response = JSON.parse(response);
-				// if (response.error == "null"){
-					
-					// if (response.success == true){
-						// alert("Envoyé avec succès !");
-					// }
-					// else {
-						// alert("Non envoyé !");
-					// }
-				// }
-			// },
-			// error: function(XMLHttpRequest, textStatus, errorThrown) { 
-				// alert("Status: " + textStatus); alert("Error: " + errorThrown); 
-			// } 
-		// });
-	// });
 	
 	$("#sendToRobot").click(function() {
 		var draw = "des:"+$("#ListOfPoints").text();

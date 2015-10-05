@@ -5,6 +5,8 @@
   <meta charset="utf-8">
   <meta name="format-detection" content="telephone=no">
   <link rel="stylesheet" href="css/style.css">
+  <link href="style/style.css" rel="stylesheet" type="text/css">
+  <link href="css/ihover.css" rel="stylesheet" type="text/css">
   <script src="js/jquery.js"></script>
   <script src="js/jquery-migrate-1.1.1.js"></script>
   <script src="js/script.js"></script>
@@ -76,7 +78,7 @@ $(document).ready(function() {
 			resetForm: true        // reset the form after successful submit 
 		}; 
 		
-	 $('#MyUploadForm').submit(function() { 
+	 $('#MyUploadForm').submit(function(e) { 
 			$(this).ajaxSubmit(options);  			
 			// always return false to prevent standard browser submit and page navigation 
 			return false; 

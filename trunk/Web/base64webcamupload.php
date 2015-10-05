@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$img = $data; // Your data 'data:image/png;base64,AAAFBfj42Pj4';
 	$img = str_replace('base64image:data:image/png;base64,', '', $img);
 	$img = str_replace(' ', '+', $img);
+	echo $img;
 	$data = base64_decode($img);
 	file_put_contents($UploadDirectory.'webcam'.$Random_Number.'.png', $data);
 	

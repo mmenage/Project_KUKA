@@ -59,18 +59,6 @@
 	</div>
 
 	<script>
-	$("#snap").click(function() {
-		var base64image = "base64image:"+$("#imagepreview").attr("src");
-		$.ajax({
-			url: 'base64webcamupload.php',
-			type: 'POST',
-			data: base64image,
-			dataType: 'text',
-			error: function(XMLHttpRequest, textStatus, errorThrown) { 
-				alert("Status: " + textStatus); alert("Error: " + errorThrown); 
-			} 
-		});
-	});
 	$("#sendToRobot").click(function() {
 		var cam = "cam:"+$("#imagepreview").attr("src");
 		$.ajax({
@@ -132,6 +120,16 @@
 		var data = canvas.toDataURL('image/png');
 		
 		$("#imagepreview").attr("src", data);
+		var base64image = "base64image:"+$("#imagepreview").attr("src");
+		$.ajax({
+			url: 'base64webcamupload.php',
+			type: 'POST',
+			data: base64image,
+			dataType: 'text',
+			error: function(XMLHttpRequest, textStatus, errorThrown) { 
+				alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+			} 
+		});
 	});
 	</script>
 
