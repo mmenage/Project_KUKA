@@ -103,6 +103,7 @@ menu,
 nav,
 section {
   display: block;
+  background:white;
 }
 body {
   line-height: 1;
@@ -466,6 +467,7 @@ table {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+	background:white;
   }
   .select-menu {
     display: block !important;

@@ -3,14 +3,10 @@
 <head>
   <title>Dessin</title>
   <meta charset="utf-8">
-  <meta name="format-detection" content="telephone=no">
-  <link rel="icon" href="images/favicon.ico">
-  <link rel="shortcut icon" href="images/favicon.ico">
-  <link rel="stylesheet" href="css/stuck.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/ihover.css">
-  <link href="style/style.css" rel="stylesheet" type="text/css">
   
+  <meta name="format-detection" content="telephone=no">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="style/style.css" rel="stylesheet" type="text/css">
   <script src="js/jquery.js"></script>
   <script src="js/jquery-migrate-1.1.1.js"></script>
   <script src="js/script.js"></script>
