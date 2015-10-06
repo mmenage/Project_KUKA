@@ -78,53 +78,56 @@
 
     //SERVER EXECUTION
 
-    error_reporting(~E_NOTICE);
-    set_time_limit (0);
+    error_reporting(~E_NOTICE); //Error management
+    set_time_limit (0); //No limit script execution
      
-    $address = "192.168.1.10";
-    $port = "4035";
-    $max_clients = 10;
+    $address = "192.168.1.10"; //set adress server
+    $port = "4035"; //set port
+    $max_clients = 1; //set max client
+
+    //###NETWORK-SOCKET ERRORS MANAGEMENT
      
-    if(!($sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP )))
-    {
-        $errorcode = socket_last_error();
-        $errormsg = socket_strerror($errorcode);
+        if(!($sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP )))
+        {
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+             
+            die("Couldn't create socket: [$errorcode] $errormsg \n");
+        }
          
-        die("Couldn't create socket: [$errorcode] $errormsg \n");
-    }
-     
-    echo "Socket created \n";
-     
-    // Bind the source address
-    if( !socket_bind($sock, $address , $port) )
-    {
-        $errorcode = socket_last_error();
-        $errormsg = socket_strerror($errorcode);
+        echo "Socket created [OK]\n";
          
-        die("Could not bind socket : [$errorcode] $errormsg \n");
-    }
-     
-    echo "Socket bind OK \n";
-     
-    if(!socket_listen ($sock , 1))
-    {
-        $errorcode = socket_last_error();
-        $errormsg = socket_strerror($errorcode);
+        // Binding source address
+        if( !socket_bind($sock, $address , $port) )
+        {
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+             
+            die("Couldn't bind socket : [$errorcode] $errormsg \n");
+        }
          
-        die("Could not listen on socket : [$errorcode] $errormsg \n");
-    }
+        echo "Socket bind [OK]\n";
+         
+        if(!socket_listen ($sock , 1))
+        {
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+             
+            die("Couldn't listen on socket : [$errorcode] $errormsg \n");
+        }
+    //###END ERRORS MANAGEMENT
      
-    echo "Socket listen OK \n";
+    echo "Socket listen [OK]\n";
      
     echo "Waiting for incoming connections... \n";
      
-    //array of client sockets
+    //create clients sockets array
     $client_socks = array();
      
-    //array of sockets to read
+    //creat read socket array
     $read = array();
      
-    //start loop to listen for incoming connections and process existing connections
+    //Listening loop awaiting connection
     while (true) 
     {
         //prepare array of readable client sockets
@@ -160,52 +163,24 @@
                 {
                     $client_socks[$i] = socket_accept($sock);
                      
-                    //display information about the client who is connected
+                    //displa@y information about the client who is connected
                     if(socket_getpeername($client_socks[$i], $address, $port))
                     {
-                        echo $GLOBALS['src']."bite";
+                        //echo $GLOBALS['src'];
                         echo "Client $address : $port is now connected to us.\n";
                         $socket_test_flush=socket_write($client_socks[$i] , $GLOBALS['src']);
+                        exit(0);
                         break;
                     }
                      
-                    //Send Welcome message to client
-                    // $message .= "{'dessin':[{p1:'0,0',p2:'1,0',p3:'1,1'}]}";
-                    // socket_write($client_socks[$i] , $message);
-                    //break;
-
-                    $message_server = socket_read($client_socks[$i] , 1024);
-                    socket_write($client_socks[$i], $message_server);
+                    // $message_server = socket_read($client_socks[$i] , 1024);
+                    // socket_write($client_socks[$i], $message_server);
                     socket_shutdown($sock, 2);
                     socket_close($sock);
                     socket_close($client_socks[i]);
+                    socket_close($socket_test_flush);
                 }
             }
         }
-     
-        // //check each client if they send any data
-        // for ($i = 0; $i < $max_clients; $i++)
-        // {
-        //     if (in_array($client_socks[$i] , $read))
-        //     {
-        //         $input = socket_read($client_socks[$i] , 1024);
-                 
-        //         if ($input == null) 
-        //         {
-        //             //zero length string meaning disconnected, remove and close the socket
-        //             unset($client_socks[$i]);
-        //             socket_close($client_socks[$i]);
-        //         }
-     
-        //         $n = trim($input);
-     
-        //         $output = "Sent by client : $input";
-                 
-        //         echo "Sending output to client : $input \n";
-                 
-        //         //send response to client
-        //         socket_write($client_socks[$i] , $output);
-        //     }
-        // }
     }
 ?>
