@@ -119,7 +119,7 @@ public class Client {
     public static void main(String [] args) {
         String message = null;
         // on renseigne l'adresse du serveur
-        String leServeur = "172.30.1.117";	
+        String leServeur = "172.30.1.117";
         if (args.length==1) {
             leServeur = args[0];
         }
