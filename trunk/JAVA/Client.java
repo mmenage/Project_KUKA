@@ -8,8 +8,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class Client {
-    protected static final int PORT = 3344;
-    private String serveur = "172.30.1.117";
+    protected static final int PORT = 3368;
+    private String serveur = "172.30.1.121";
     private BufferedReader in = null;
     private Socket s = null;
     // fonction de connection au serveur
@@ -79,6 +79,10 @@ public class Client {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
+        // récupération du nombre de point contenu dans la trame JSON
+        int NbPoint = Integer.parseInt(o.get("nbPoints").toString());
+        System.out.println("Nombre de point : " + NbPoint);
+        
         // création d'une liste d'objet JSON contenant les paramètres de la trame JSON ("dessin")
         ArrayList<JSONObject> liste = (ArrayList<JSONObject>) o.get("dessin");
         // pour tous les objets de la trame ("L1","L2" etc...)
@@ -104,11 +108,12 @@ public class Client {
                         String table[] = value.split(";",2);
                         // on récupére le premier élément qui correspond à l'axe X
                         String x = table[0];
+                        
                         // on récupére le deuxième élément qui correspond à l'axe Y
                         String y = table[1];
                         // on print ces éléments
-                        System.out.println("x" + nbPoint + "= " + x);
-                        System.out.println("y" + nbPoint + "= " + y);
+                        System.out.println("x" + nbPoint + "= " + ConvertionX(Double.parseDouble(x)));
+                        System.out.println("y" + nbPoint + "= " + ConvertionY(Double.parseDouble(y)));
                         nbPoint++;
                     }
                 }
@@ -119,7 +124,7 @@ public class Client {
     public static void main(String [] args) {
         String message = null;
         // on renseigne l'adresse du serveur
-        String leServeur = "172.30.1.117";
+        String leServeur = "172.30.1.121";	
         if (args.length==1) {
             leServeur = args[0];
         }
