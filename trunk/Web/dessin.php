@@ -62,10 +62,10 @@
 
 		<div id="container" style="position: relative;">
 			<div id="canvasDiv" style="float:left;">
-				<canvas id="imageView"  width="400" height="300" ></canvas>
-				<canvas id="imageTemp" width="400" height="300"></canvas>
+				<canvas id="imageView"  width="600" height="400" ></canvas>
+				<canvas id="imageTemp" width="600" height="400"></canvas>
 			</div>
-			<img id="imagePreview" width="400" height="300"  style="float:right;"/>
+			<img id="imagePreview" width="600" height="400"  style="float:right;display:none;"/>
 			<div style="clear:both"></div><br/>
 			<div id="point" style="display:none;"></div>
 			<div id="ListOfPoints" style="display:none;"></div>
@@ -83,8 +83,8 @@
 		imageFoo.src = dataUrl;
 
 		// Style your image here
-		imageFoo.style.width = '400px';
-		imageFoo.style.height = '300px';
+		imageFoo.style.width = '600px';
+		imageFoo.style.height = '400px';
 
 		// After you are done styling it, append it to the BODY element
 		document.getElementById("imagePreview").src = imageFoo.src;
