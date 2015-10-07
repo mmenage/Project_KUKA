@@ -8,8 +8,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class Client {
-    protected static final int PORT = 3368;
-    private String serveur = "172.30.1.121";
+    protected static final int PORT = 3364;
+    private String serveur = "172.30.1.117";
     private BufferedReader in = null;
     private Socket s = null;
     // fonction de connection au serveur
@@ -36,10 +36,13 @@ public class Client {
                 // si le message = null on ferme la connection
                 if (mess == null) {
                     System.out.println("Connexion terminée");
+                    in.close();
+                    s.close();
                     break;
                 }
                 // on print le message reçu
                 System.out.println(mess);
+                in.close();
                 break;
             }
         }
@@ -66,11 +69,14 @@ public class Client {
         return valueYConverted;
     }
     // fonction de traitement de la trame JSON réceptionnée
-    public static void traitement(String chaine) {
-        int nbPoint = 1;
+    public static Vector2[] traitement (String chaine) {
+        int nbPoint = 0;
         // création des objets JSONObject et JSONParser
         JSONParser p = new JSONParser();
         JSONObject o = null;
+        
+        Vector2[] tableau;
+        
         try {
             // traduction en message reçu en objet JSON
             o = (JSONObject) p.parse(chaine);
@@ -79,9 +85,12 @@ public class Client {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
+        
         // récupération du nombre de point contenu dans la trame JSON
         int NbPoint = Integer.parseInt(o.get("nbPoints").toString());
-        System.out.println("Nombre de point : " + NbPoint);
+        System.out.println("Nombre de points : " + NbPoint);
+        
+        tableau = new Vector2[NbPoint];
         
         // création d'une liste d'objet JSON contenant les paramètres de la trame JSON ("dessin")
         ArrayList<JSONObject> liste = (ArrayList<JSONObject>) o.get("dessin");
@@ -93,7 +102,7 @@ public class Client {
             for( Object obj: keys) {
                 // création d'une liste d'objets JSON contenant les objets de la collection
                 ArrayList<JSONObject> keyl = (ArrayList<JSONObject>) obj;
-                nbPoint = 1;
+                nbPoint = 0;
                 // pour tous les objets de la collection ("150;100","200;50", etc...)
                 for(JSONObject pt: keyl){
                     // création d'un itérator pour isoler les éléments
@@ -112,19 +121,25 @@ public class Client {
                         // on récupére le deuxième élément qui correspond à l'axe Y
                         String y = table[1];
                         // on print ces éléments
-                        System.out.println("x" + nbPoint + "= " + ConvertionX(Double.parseDouble(x)));
-                        System.out.println("y" + nbPoint + "= " + ConvertionY(Double.parseDouble(y)));
+                        //System.out.println("x" + nbPoint + "= " + ConvertionX(Double.parseDouble(x)));
+                        //System.out.println("y" + nbPoint + "= " + ConvertionY(Double.parseDouble(y)));
+                        
+                        tableau[nbPoint] = new Vector2(ConvertionX(Double.parseDouble(x)), ConvertionY(Double.parseDouble(y)));
+                        System.out.println(tableau[nbPoint].x);
+                        System.out.println(tableau[nbPoint].y);
                         nbPoint++;
                     }
                 }
             }
         }
+        return tableau;
     }
     // programme principal
     public static void main(String [] args) {
         String message = null;
         // on renseigne l'adresse du serveur
-        String leServeur = "172.30.1.121";	
+        String leServeur = "172.30.1.117";	
+        Vector2[] tableau;
         if (args.length==1) {
             leServeur = args[0];
         }
@@ -137,6 +152,6 @@ public class Client {
         //System.out.println(message);
         
         // lancement de la fonction de traitement de la trame JSON reçu et passée en paramètre
-        traitement(message);
+        tableau = traitement(message);
     }
 }
